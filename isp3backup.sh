@@ -305,7 +305,7 @@ echo $(dateStatement) $message | tee -a $LOGDIR/$FDATE.log
 ########### End compression #############
 
 ########### Start ftp save #############
-if ((FTPBACKUP == 1 )); then
+if (($FTPBACKUP == 1 )); then
 
   message="Start FTP save"
   echo $(dateStatement) $message | tee -a $LOGDIR/$FDATE.log
@@ -329,7 +329,7 @@ fi
 ########### End ftp save #############
 
 ########### Start rsync save #############
-if ((RSYNCBACKUP == 1 )); then
+if (($RSYNCBACKUP == 1 )); then
 
   message="Start RSYNC save"
   echo $(dateStatement) $message | tee -a $LOGDIR/$FDATE.log
