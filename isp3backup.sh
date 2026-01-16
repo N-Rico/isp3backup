@@ -69,19 +69,19 @@ DBPASS=""				# database password
 FTPBACKUP=0         # Activate FTP Backup
 FTPMAXBACKUP=2      # Max number of backups saved on FTP Server
 
-FTPHOST='' #FTP HOST
-FTPUSER=''          # FTP USER
-FTPPASSWD=''        # FTP PASSWORD
-FTPBACKUPDIR='ispconfig_backup' #FTP directory for backup. Please create it before proceed
+FTPHOST="" #FTP HOST
+FTPUSER=""          # FTP USER
+FTPPASSWD=""        # FTP PASSWORD
+FTPBACKUPDIR="ispconfig_backup" #FTP directory for backup. Please create it before proceed
 
 RSYNCBACKUP=1        # Activate backup through RSYNC
 RSYNCMAXBACKUP=2     # Max number of backups saved on remote server
 
-RSYNCHOST=''    # Remote SSH host
-RSYNCPORT='22'
-RSYNCUSER=''
-RSYNCBACKUPDIR='ispconfig_backup'
-RSYNCKEYFILE=''
+RSYNCHOST=""    # Remote SSH host
+RSYNCPORT="22"
+RSYNCUSER=""
+RSYNCBACKUPDIR="ispconfig_backup"
+RSYNCKEYFILE="/home/user/.ssh/id_rsa"
 
 ## End user editable variables
 
@@ -305,7 +305,7 @@ echo $(dateStatement) $message | tee -a $LOGDIR/$FDATE.log
 ########### End compression #############
 
 ########### Start ftp save #############
-if (( FTPBACKUP == 1 )); then
+if [ "$FTPBACKUP" = 1 ]; then
 
   message="Start FTP save"
   echo $(dateStatement) $message | tee -a $LOGDIR/$FDATE.log
@@ -329,7 +329,7 @@ fi
 ########### End ftp save #############
 
 ########### Start rsync save #############
-if (( RSYNCBACKUP == 1 )); then
+if [ "$RSYNCBACKUP" = 1 ]; then
 
   message="Start RSYNC save"
   echo $(dateStatement) $message | tee -a $LOGDIR/$FDATE.log
@@ -340,7 +340,7 @@ backupFile=$BACKUPDIR/$FDATE.tar.gz
 RSYNCDEST=$RSYNCUSER@$RSYNCHOST::$RSYNCBACKUPDIR/$FDATE.tar.gz
 RSYNCSRC=$backupFile
 
-rsync azvhHS -e 'ssh -i $RSYNCKEYFILE -p $RSYNCPORT' --delete --progress --numeric-ids $RSYNCSRC $RSYNCDEST
+rsync -azvhHS -e "ssh -i $RSYNCKEYFILE -p $RSYNCPORT" --progress --numeric-ids $RSYNCSRC $RSYNCDEST
 
 message="RSYNC save completed"
 echo $(dateStatement) $message | tee -a $LOGDIR/$FDATE.log
