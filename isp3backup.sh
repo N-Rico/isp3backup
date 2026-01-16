@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # THIS SCRIPT HAS BEEN UPDATED BY JOHANN COSIC (www.johann-cosic.oramail.fr). PLEASE SEE
 # BELOW FOR ORIGINAL SCRIPT AUTHORS.
@@ -40,7 +40,9 @@
 # date: 2018-04-22 16:50:00 UTC
 # website: https://johann-cosic.oramail.fr
 #
-
+# updated by: Enrico Klein with help of Grok
+# date: 2026-01-16 16:00 UTC+1
+# added rsync as alternative to ftp, added option to include other (config) files and switched to /bin/bash for better array support.
 ## For log, precede with date
 dateStatement(){
     date +'%F %H:%M:%S'
@@ -58,6 +60,19 @@ MAILDIR="/var/vmail"					# mail directory
 LETSENCRYPTDIR="/etc/letsencrypt"   #letsencrypt directory
 HTTPDIR="/var/log/ispconfig/httpd" #httpd directory
 APACHE2DIR="/etc/apache2"  #apache dir
+
+EXTRA_CONFIGS=(
+    "/etc/postfix"
+    "/etc/hosts"
+    "/etc/mysql/my.cnf"                 # or /etc/mysql/conf.d/*
+    "/etc/mysql/mariadb.conf.d/50-server.cnf"
+    "/etc/clamav/clamd.conf"
+    "/etc/fail2ban"
+    "/etc/signaling/server.conf"
+    "/etc/nats-server.conf"
+    "/etc/turnserver.conf"
+    "/opt/janus/etc"
+)
 
 BACKUPDIR="/backup"					# backup directory
 LOGDIR="/var/log/isp3backup"   #log directory
@@ -143,6 +158,7 @@ mkdir $BACKUPDIR/$FDATE/webs/
 mkdir $BACKUPDIR/$FDATE/vmail/
 mkdir $BACKUPDIR/$FDATE/users/
 mkdir $BACKUPDIR/$FDATE/letsencrypt/
+mkdir $BACKUPDIR/$FDATE/extra_configs/
 
 message="Sub-directories created"
 echo $(dateStatement) $message | tee -a $LOGDIR/$FDATE.log
@@ -173,6 +189,18 @@ message="Apache2 backup completed"
 echo $(dateStatement) $message | tee -a $LOGDIR/$FDATE.log
 
 ########### End apache2 backup #############
+
+########### Start extra_configs backup #############
+
+message="Start Extra_configs backup"
+echo $(dateStatement) $message | tee -a $LOGDIR/$FDATE.log
+
+tar -zcpf $BACKUPDIR/$FDATE/extra_configs/extra_configs.tar.gz "${EXTRA_CONFIGS[@]}"
+
+message="Extras_configs backup completed"
+echo $(dateStatement) $message | tee -a $LOGDIR/$FDATE.log
+
+########### End extra_configs backup #############
 
 ########### Start databases backup #############
 message="Start MySQL databases backup"
